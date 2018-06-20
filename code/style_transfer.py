@@ -154,8 +154,8 @@ class Model(object):
 
         self.saver = tf.train.Saver()
 
-def transfer(model, decoder, sess, args, vocab, data0, data1, out_path):
-    batches, order0, order1 = get_batches(data0, data1,
+def transfer(model, decoder, sess, args, vocab, data0, data1, datar0, datar1, out_path):
+    batches, order0, order1 = get_batches(data0, data1, datar0, datar1,
         vocab.word2id, args.batch_size)
 
     #data0_rec, data1_rec = [], []
@@ -203,8 +203,10 @@ if __name__ == '__main__':
 
     #####   data preparation   #####
     if args.train:
-        train0 = load_sent(args.train + '.0', args.max_train_size)
-        train1 = load_sent(args.train + '.1', args.max_train_size)
+        train0 = load_sent(args.train + '.m.0', args.max_train_size)
+        train1 = load_sent(args.train + '.m.1', args.max_train_size)
+        trainr0 = load_sent(args.train + '.r.0', args.max_train_size)
+        trainr1 = load_sent(args.train + '.r.1', args.max_train_size)
         print '#sents of training file 0:', len(train0)
         print '#sents of training file 1:', len(train1)
 
@@ -215,8 +217,10 @@ if __name__ == '__main__':
     print 'vocabulary size:', vocab.size
 
     if args.dev:
-        dev0 = load_sent(args.dev + '.0')
-        dev1 = load_sent(args.dev + '.1')
+        dev0 = load_sent(args.dev + '.m.0')
+        dev1 = load_sent(args.dev + '.m.1')
+        devr0 = load_sent(args.dev + '.r.0')
+        devr1 = load_sent(args.dev + '.r.1')
 
     if args.test:
         test0 = load_sent(args.test + '.0')
@@ -233,7 +237,7 @@ if __name__ == '__main__':
             decoder = greedy_decoding.Decoder(sess, args, vocab, model)
 
         if args.train:
-            batches, _, _ = get_batches(train0, train1, vocab.word2id,
+            batches, _, _ = get_batches(train0, train1, trainr0, trainr1, vocab.word2id,
                 args.batch_size, noisy=True)
             random.shuffle(batches)
 
@@ -291,7 +295,7 @@ if __name__ == '__main__':
 
                 if args.dev:
                     dev_losses = transfer(model, decoder, sess, args, vocab,
-                        dev0, dev1, args.output + '.epoch%d' % epoch)
+                        dev0, dev1, devr0, devr1, args.output + '.epoch%d' % epoch)
                     dev_losses.output('dev')
                     if dev_losses.values[0] < best_dev:
                         best_dev = dev_losses.values[0]
