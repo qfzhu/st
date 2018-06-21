@@ -79,6 +79,7 @@ def get_batch(x, r, y, word2id, noisy=False, min_len=5):
             'size':       len(x),
             'len':        max_len+1}
 
+
 def get_batches(x0, x1, r0, r1, word2id, batch_size, noisy=False):
     if len(x0) < len(x1):
         x0 = makeup(x0, len(x1))
